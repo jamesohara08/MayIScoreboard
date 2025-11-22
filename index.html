@@ -113,6 +113,12 @@
         }
       }
 
+      function createNewSpreadsheet() {
+        const id = Sheets.Spreadsheets.create({properties: {title: "sample"}}).spreadsheetId;
+        console.log(id)
+      }
+
+
       function create(title, callback) {
         try {
           gapi.client.sheets.spreadsheets.create({
