@@ -86,7 +86,6 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
-          create("Test Spreadsheet", null)
         };
 
         if (gapi.client.getToken() === null) {
@@ -97,6 +96,7 @@
           // Skip display of account chooser and consent dialog for an existing session.
           tokenClient.requestAccessToken({prompt: ''});
         }
+        create("Test Spreadsheet", null);
       }
 
       /**
