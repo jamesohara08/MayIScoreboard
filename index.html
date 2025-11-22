@@ -86,7 +86,7 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
-          createNewSpreadsheet();
+          create("Test Spreadsheet", null)
         };
 
         if (gapi.client.getToken() === null) {
@@ -112,12 +112,6 @@
           document.getElementById('signout_button').style.visibility = 'hidden';
         }
       }
-
-      function createNewSpreadsheet() {
-        const id = Sheets.Spreadsheets.create({properties: {title: "sample"}}).spreadsheetId;
-        console.log(id)
-      }
-
 
       function create(title, callback) {
         try {
