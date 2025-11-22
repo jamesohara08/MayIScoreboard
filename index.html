@@ -86,7 +86,7 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
-          create("Test Spreadsheet", null)
+          createNewSpreadsheet();
         };
 
         if (gapi.client.getToken() === null) {
