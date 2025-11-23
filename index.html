@@ -86,7 +86,8 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
-          create("Test Spreadsheet", null)
+          //create("Test Spreadsheet", null)
+          updateValues("1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE","A1:E4","USER_ENTERED",)
         };
 
         if (gapi.client.getToken() === null) {
@@ -122,6 +123,40 @@
           }).then((response) => {
             if (callback) callback(response);
             console.log('Spreadsheet ID: ' + response.result.spreadsheetId);
+          });
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+      }
+
+      function updateValues(spreadsheetId, range, valueInputOption) {
+        let values = [
+          [
+            "Hand","James", "Amy", "Steve", "Elizabeth"
+          ],
+          [
+            "Two Lays", "0", "5","55","100"
+          ],
+          [
+            "Two Runs", "0", "55","5","110"
+          ],
+          [
+            "One Lay, One Run", "20", "50","5","0"
+          ]
+        ];
+        const body = {
+          values: values,
+        };
+        try {
+          gapi.client.sheets.spreadsheets.values.update({
+            spreadsheetId: spreadsheetId,
+            range: range,
+            valueInputOption: valueInputOption,
+            resource: body,
+          }).then((response) => {
+            const result = response.result;
+            console.log(`${result.updatedCells} cells updated.`);
           });
         } catch (err) {
           document.getElementById('content').innerText = err.message;
