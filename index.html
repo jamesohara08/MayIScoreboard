@@ -10,6 +10,7 @@
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <buttom id="send_data" onclick="updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE','A1:F4','USER_ENTERED')">Send Data</button>
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
@@ -99,7 +100,6 @@
               .addView(google.picker.ViewId.DOCS)
               .setCallback((data) => {
                 console.log(data);
-                updateValues("1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE","A1:F4","USER_ENTERED")
               })
               .build();
 
@@ -158,7 +158,7 @@
             "Two Runs", "0", "55","5","110","65"
           ],
           [
-            "One Lay, One Run", "20", "50","5","0","100"
+            "One Lay, One Run", "20", "50","5","0","150"
           ]
         ];
         const body = {
