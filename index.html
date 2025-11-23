@@ -94,7 +94,13 @@
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
           //create("Test Spreadsheet", null)
-          const picker = new google.picker.PickerBuilder()
+          try {
+            gapi.client.sheets.spreadsheets.values.get({
+              spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
+              range: 'A1:A2',
+            });
+          } catch(err) {
+            const picker = new google.picker.PickerBuilder()
               .setOAuthToken(gapi.client.getToken().access_token)
               .setAppId('701363070682')
               .addView(google.picker.ViewId.DOCS)
@@ -103,7 +109,8 @@
               })
               .build();
 
-          picker.setVisible(true);
+            picker.setVisible(true);
+          }
         };
 
         if (gapi.client.getToken() === null) {
