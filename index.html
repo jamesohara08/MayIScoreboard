@@ -94,7 +94,7 @@
           document.getElementById('authorize_button').innerText = 'Refresh';
           //create("Test Spreadsheet", null)
           const picker = new google.picker.PickerBuilder()
-              .setOAuthToken(gapi.client.getToken())
+              .setOAuthToken(gapi.client.getToken().access_token)
               .setAppId('701363070682')
               .addView(google.picker.ViewId.DOCS)
               .setCallback((data) => {
