@@ -99,12 +99,11 @@
               .addView(google.picker.ViewId.DOCS)
               .setCallback((data) => {
                 console.log(data);
+                updateValues("1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE","A1:F4","USER_ENTERED")
               })
               .build();
 
           picker.setVisible(true);
-
-          updateValues("1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE","A1:F4","USER_ENTERED",)
         };
 
         if (gapi.client.getToken() === null) {
