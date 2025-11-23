@@ -96,7 +96,6 @@
           const picker = new google.picker.PickerBuilder()
               .setOAuthToken(gapi.client.getToken())
               .setAppId('701363070682')
-              .setDeveloperKey('AIzaSyAQBIUFmACIsrlDAn-Dz8wkAAWiIlpAWiE')
               .addView(google.picker.ViewId.DOCS)
               .setCallback((data) => {
                 console.log(data);
