@@ -31,6 +31,7 @@
       let tokenClient;
       let gapiInited = false;
       let gisInited = false;
+      let pickerInited = false;
 
       document.getElementById('authorize_button').style.visibility = 'hidden';
       document.getElementById('signout_button').style.visibility = 'hidden';
@@ -39,11 +40,12 @@
        * Callback after api.js is loaded.
        */
       function gapiLoaded() {
-        gapi.load(
-            'picker',
-            {'callback': this.pickerInit.bind(this)}
-        );
+        gapi.load('picker',onPickerApiLoad());
         gapi.load('client', initializeGapiClient);
+      }
+
+      function onPickerApiLoad() {
+        pickerInited = true;
       }
 
       /**
@@ -75,7 +77,7 @@
        * Enables user interaction after all libraries are loaded.
        */
       function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
+        if (gapiInited && gisInited && pickerInited) {
           document.getElementById('authorize_button').style.visibility = 'visible';
         }
       }
