@@ -39,6 +39,10 @@
        * Callback after api.js is loaded.
        */
       function gapiLoaded() {
+        gapi.load(
+            'picker',
+            {'callback': this.pickerInit.bind(this)}
+        );
         gapi.load('client', initializeGapiClient);
       }
 
