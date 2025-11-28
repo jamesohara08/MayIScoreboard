@@ -125,25 +125,26 @@
                 if (resp.error !== undefined) {
                     throw (resp);
                 }
-            try {
-                gapi.client.sheets.spreadsheets.values.get({
-                  spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
-                  range: 'A1:A2',
-                });
-                buildNewGame();
-              } catch(err) {
-                const picker = new google.picker.PickerBuilder()
-                  .setOAuthToken(gapi.client.getToken().access_token)
-                  .setAppId('701363070682')
-                  .addView(google.picker.ViewId.DOCS)
-                  .setCallback((data) => {
-                    console.log(data);
-                    buildNewGame();
-                  })
-                  .build();
-
-                picker.setVisible(true);
-              }
+                try {
+                    gapi.client.sheets.spreadsheets.values.get({
+                      spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
+                      range: 'A1:A2',
+                    }).then((response) => {
+                        console.log(response);
+                        buildNewGame();
+                    });    
+                } catch(err) {
+                    const picker = new google.picker.PickerBuilder()
+                      .setOAuthToken(gapi.client.getToken().access_token)
+                      .setAppId('701363070682')
+                      .addView(google.picker.ViewId.DOCS)
+                      .setCallback((data) => {
+                        console.log(data);
+                        buildNewGame();
+                      })
+                      .build();
+                    picker.setVisible(true);
+                }
             };
 
             if (gapi.client.getToken() === null) {
