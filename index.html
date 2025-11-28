@@ -119,11 +119,13 @@
               }
               //create("Test Spreadsheet", null)
               try {
-                console.log(gapi.client.sheets.spreadsheets.values.get({
+                gapi.client.sheets.spreadsheets.values.get({
                   spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
                   range: 'A1:A2',
-                }));
-                buildNewGame();
+                }).then((response) => {
+                    console.log(response);
+                    buildNewGame();
+                });
               } catch(err) {
                 const picker = new google.picker.PickerBuilder()
                   .setOAuthToken(gapi.client.getToken().access_token)
