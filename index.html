@@ -181,8 +181,9 @@
                   "resource": batchUpdateRequest,
                 }).then((response) => {
                     console.log(response);
-                    updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "'" + peer.id+"'!A1:A2",[startTime]);
-                    updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "'" + peer.id+"'!B1:H1",rounds);
+                    console.log("'" + peer.id+"'!A1:A2");
+                    updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "A1:A2",[startTime]);
+                    updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "B1:H1",rounds);
                 });
             });
             is_host = true;
