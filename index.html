@@ -310,12 +310,13 @@
                                         <option value="null" disabled selected>Choose Player</option>`
                 for (const [playername, playerscore] of playerdata){
                     let playerselect = `<option value="${playername}">${playername}</option>`
-                    editscorebug += playerselect
+                    editscorebug += playerselect;
+                }
                 editscorebug += `
                 </select>
                 <input class="w3-input w3-margin-bottom" type="text" placeholder="Score" id="editedscore">
                 <button class="w3-button w3-block w3-blue w3-margin-bottom" id="send_edited_score">Update</button>
-              </div>`
+              </div>`;
                 scoreboard += editscorebug;
             }
             main_content.insertAdjacentHTML('beforeend', scoreboard);
