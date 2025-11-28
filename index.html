@@ -114,11 +114,10 @@
 
         function createNewGame(){
             tokenClient.callback = async (resp) => {
-              if (resp.error !== undefined) {
-                throw (resp);
-              }
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
               //create("Test Spreadsheet", null)
-              try {
                 gapi.client.sheets.spreadsheets.values.get({
                   spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
                   range: 'A1:A2',
@@ -126,20 +125,20 @@
                     console.log(response);
                     buildNewGame();
                 });
-              } catch(err) {
-                const picker = new google.picker.PickerBuilder()
-                  .setOAuthToken(gapi.client.getToken().access_token)
-                  .setAppId('701363070682')
-                  .addView(google.picker.ViewId.DOCS)
-                  .setCallback((data) => {
-                    console.log(data);
-                    buildNewGame();
-                  })
-                  .build();
+            //   } catch(err) {
+            //     const picker = new google.picker.PickerBuilder()
+            //       .setOAuthToken(gapi.client.getToken().access_token)
+            //       .setAppId('701363070682')
+            //       .addView(google.picker.ViewId.DOCS)
+            //       .setCallback((data) => {
+            //         console.log(data);
+            //         buildNewGame();
+            //       })
+            //       .build();
 
-                picker.setVisible(true);
-              }
-            };
+            //     picker.setVisible(true);
+            //   }
+            // };
         }
 
         function buildNewGame(){
