@@ -89,14 +89,6 @@
         }
 
         function updateValues(spreadsheetId, range, values, valueInputOption='USER_ENTERED') {
-            // if (gapi.client.getToken() === null) {
-            //   // Prompt the user to select a Google Account and ask for consent to share their data
-            //   // when establishing a new session.
-            //   tokenClient.requestAccessToken({prompt: 'consent'});
-            // } else {
-            //   // Skip display of account chooser and consent dialog for an existing session.
-            //   tokenClient.requestAccessToken({prompt: ''});
-            // }
             const body = {
               values: values,
             };
@@ -133,29 +125,35 @@
                 if (resp.error !== undefined) {
                     throw (resp);
                 }
-              //create("Test Spreadsheet", null)
+            try {
                 gapi.client.sheets.spreadsheets.values.get({
                   spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
                   range: 'A1:A2',
-                }).then((response) => {
-                    console.log(response);
-                    buildNewGame();
                 });
-            }
-            //   } catch(err) {
-            //     const picker = new google.picker.PickerBuilder()
-            //       .setOAuthToken(gapi.client.getToken().access_token)
-            //       .setAppId('701363070682')
-            //       .addView(google.picker.ViewId.DOCS)
-            //       .setCallback((data) => {
-            //         console.log(data);
-            //         buildNewGame();
-            //       })
-            //       .build();
+                buildNewGame();
+              } catch(err) {
+                const picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.client.getToken().access_token)
+                  .setAppId('701363070682')
+                  .addView(google.picker.ViewId.DOCS)
+                  .setCallback((data) => {
+                    console.log(data);
+                    buildNewGame();
+                  })
+                  .build();
 
-            //     picker.setVisible(true);
-            //   }
-            // };
+                picker.setVisible(true);
+              }
+            };
+
+            if (gapi.client.getToken() === null) {
+              // Prompt the user to select a Google Account and ask for consent to share their data
+              // when establishing a new session.
+              tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+              // Skip display of account chooser and consent dialog for an existing session.
+              tokenClient.requestAccessToken({prompt: ''});
+            }
         }
 
         function buildNewGame(){
