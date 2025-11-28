@@ -123,6 +123,7 @@
                   spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
                   range: 'A1:A2',
                 });
+                buildNewGame();
               } catch(err) {
                 const picker = new google.picker.PickerBuilder()
                   .setOAuthToken(gapi.client.getToken().access_token)
@@ -130,12 +131,15 @@
                   .addView(google.picker.ViewId.DOCS)
                   .setCallback((data) => {
                     console.log(data);
+                    buildNewGame();
                   })
                   .build();
 
                 picker.setVisible(true);
               }
             };
+
+        function buildNewGame(){
             var peer = new Peer();
             peer.on('open', function(id) {
                 console.log('My peer ID is: ' + id);
