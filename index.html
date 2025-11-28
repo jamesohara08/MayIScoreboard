@@ -113,6 +113,7 @@
         }
 
         function createNewGame(){
+            console.log("HERE");
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) {
                     throw (resp);
