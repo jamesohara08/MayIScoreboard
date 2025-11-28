@@ -306,9 +306,16 @@
                                         <option value="5">Three Lays</option>
                                         <option value="6">Three Runs</option>
                                     </select> 
-                                    <input class="w3-input w3-margin-bottom" type="text" placeholder="Score" id="editedscore">
-                                    <button class="w3-button w3-block w3-blue w3-margin-bottom" id="send_edited_score">Update</button>
-                                  </div>`
+                                    <select class="w3-select w3-margin-bottom" name="option" id="playerselect">
+                                        <option value="null" disabled selected>Choose Player</option>`
+                for (const [playername, playerscore] of playerdata){
+                    let playerselect = `<option value="${playername}">${playername}</option>`
+                    editscorebug += playerselect
+                editscorebug += `
+                </select>
+                <input class="w3-input w3-margin-bottom" type="text" placeholder="Score" id="editedscore">
+                <button class="w3-button w3-block w3-blue w3-margin-bottom" id="send_edited_score">Update</button>
+              </div>`
                 scoreboard += editscorebug;
             }
             main_content.insertAdjacentHTML('beforeend', scoreboard);
@@ -320,10 +327,22 @@
                 if(!is_host){
                     connectionToHost.send({'playerName':my_name,'round':round_num,'score':playerscore})
                 } else {
-                    playerdata.get(my_name)[gameround] = playerscore;
+                    playerdata.get(my_name)[round_num] = playerscore;
                     updateGame();
                 }
                 round_num++;
+            } else {
+                alert("Invalid score added, must be divisible by 5.");
+            }
+        }
+
+        function editScore(){
+            let playerscore = Number(document.getElementById("editedscore").value);
+            let playername = document.getElementById("playerselect").value;
+            let roundnum = Number(document.getElementById("round").value);
+            if(playerscore % 5 == 0){
+                playerdata.get(playername)[roundnum] = playerscore;
+                updateGame();
             } else {
                 alert("Invalid score added, must be divisible by 5.");
             }
@@ -340,6 +359,8 @@
                         sendScore();
                     } else if (event.target.id === 'joingame'){
                         connectToGame();
+                    } else if (event.target.id === 'send_edited_score'){
+                        editScore();
                     }
                 }
             });
