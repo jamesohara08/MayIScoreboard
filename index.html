@@ -221,7 +221,7 @@
             let idx = 2;
             for (const [playername, scores] of playerdata) {
                 let row = [playername].concat(scores);
-                updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "'" + host_id+"'!A" + idx + ':H' + idx, row);
+                updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', "'" + host_id+"'!A" + idx + ':H' + idx, [row]);
                 idx++;
             }
         }
