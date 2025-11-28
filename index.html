@@ -253,7 +253,8 @@
             while(main_content.firstChild){
                 main_content.removeChild(main_content.firstChild);
             }
-            let scoreboard = `<table class="w3-table-all" id="scoreboard">
+            let scoreboard = `<div class="w3-responsive">
+                                <table class="w3-table-all" id="scoreboard">
                                 <tr>
                                     <th>Name</th>
                                     <th>Two Lays</th>
@@ -280,7 +281,7 @@
                                   </tr>`
                 scoreboard += scoreboard_row
             }    
-            scoreboard += `</table>`
+            scoreboard += `</table></div>`
             let newscorebug = `<div class="w3-container w3-card-4 w3-margin" id="newscore"> 
                                     <h3>Enter Score</h3>
                                     <select class="w3-select w3-margin-bottom" name="option" id="round">
