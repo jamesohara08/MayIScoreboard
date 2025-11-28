@@ -119,10 +119,10 @@
               }
               //create("Test Spreadsheet", null)
               try {
-                gapi.client.sheets.spreadsheets.values.get({
+                console.log(gapi.client.sheets.spreadsheets.values.get({
                   spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
                   range: 'A1:A2',
-                });
+                }));
                 buildNewGame();
               } catch(err) {
                 const picker = new google.picker.PickerBuilder()
@@ -139,7 +139,7 @@
               }
             };
         }
-        
+
         function buildNewGame(){
             var peer = new Peer();
             peer.on('open', function(id) {
