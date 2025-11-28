@@ -26,6 +26,8 @@
         let gisInited = false;
         let pickerInited = false;
 
+        document.getElementById('newgame').style.visibility = 'hidden';
+
         const main_content = document.getElementById("maincontent");
         const playerconnections = [];
         var playerdata = new Map();
@@ -49,6 +51,7 @@
 
         function onPickerApiLoad() {
           pickerInited = true;
+          maybeEnableButtons();
         }
 
         /**
@@ -59,6 +62,8 @@
             await gapi.client.init({
               discoveryDocs: [DISCOVERY_DOC],
             });
+            gapiInited = true;
+            maybeEnableButtons();
         }
 
         /**
@@ -70,6 +75,17 @@
               scope: SCOPES,
               callback: '', // defined later
             });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+
+              /**
+        * Enables user interaction after all libraries are loaded.
+        */
+        function maybeEnableButtons() {
+            if (gapiInited && gisInited && pickerInited) {
+                document.getElementById('newgame').style.visibility = 'visible';
+            }
         }
 
         function updateValues(spreadsheetId, range, values, valueInputOption='USER_ENTERED') {
@@ -113,7 +129,6 @@
         }
 
         function createNewGame(){
-            console.log("HERE");
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) {
                     throw (resp);
