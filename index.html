@@ -1,194 +1,315 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html> 
+ <html lang="en-US"> 
   <head>
-    <title>Sheets API Quickstart</title>
     <meta charset="utf-8" />
+    <title>May I Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
   </head>
-  <body>
-    <p>Sheets API Quickstart</p>
+<body>
+    <div class="w3-content w3-container w3-margin-top w3-center" id="maincontent">
+        <button class="w3-button w3-xlarge w3-blue" id="newgame">Create Game</button>
+    </div>
+    <script>
+        const CLIENT_ID = '701363070682-gu522fc00h12qm3777m7sf0hsoddriv0.apps.googleusercontent.com';
 
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-    <button id="send_data" onclick="updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE','A1:F4','USER_ENTERED')">Send Data</button>
+        // Discovery doc URL for APIs used by the quickstart
+        const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+        // Authorization scopes required by the API; multiple scopes can be
+        // included, separated by spaces.
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-    <script type="text/javascript">
-      /* exported gapiLoaded */
-      /* exported gisLoaded */
-      /* exported handleAuthClick */
-      /* exported handleSignoutClick */
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+        let pickerInited = false;
 
-      const CLIENT_ID = '701363070682-gu522fc00h12qm3777m7sf0hsoddriv0.apps.googleusercontent.com';
+        const main_content = document.getElementById("maincontent");
+        const playerconnections = [];
+        var playerdata = new Map();
+        const playerNameForm = `<div class="w3-container w3-card-2 w3-margin" id="newplayer"> 
+                                    <label>Enter Name</label>
+                                    <input class="w3-input w3-margin-bottom" type="text" id="name">
+                                    <button class="w3-button w3-block w3-blue w3-margin-top w3-margin-bottom" id="joingame">Join</button>
+                                  </div>`
+        var connectionToHost;
+        var my_name;
+        var host_id;
+        var is_host = false;
 
-      // Discovery doc URL for APIs used by the quickstart
-      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
-
-      // Authorization scopes required by the API; multiple scopes can be
-      // included, separated by spaces.
-      const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-
-      let tokenClient;
-      let gapiInited = false;
-      let gisInited = false;
-      let pickerInited = false;
-
-      document.getElementById('authorize_button').style.visibility = 'hidden';
-      document.getElementById('signout_button').style.visibility = 'hidden';
-
-      /**
-       * Callback after api.js is loaded.
-       */
-      function gapiLoaded() {
-        gapi.load('picker',onPickerApiLoad());
-        gapi.load('client', initializeGapiClient);
-      }
-
-      function onPickerApiLoad() {
-        pickerInited = true;
-      }
-
-      /**
-       * Callback after the API client is loaded. Loads the
-       * discovery doc to initialize the API.
-       */
-      async function initializeGapiClient() {
-        await gapi.client.init({
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Callback after Google Identity Services are loaded.
-       */
-      function gisLoaded() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: '', // defined later
-        });
-        gisInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Enables user interaction after all libraries are loaded.
-       */
-      function maybeEnableButtons() {
-        if (gapiInited && gisInited && pickerInited) {
-          document.getElementById('authorize_button').style.visibility = 'visible';
+        /**
+        * Callback after api.js is loaded.
+        */
+        function gapiLoaded() {
+            gapi.load('picker',onPickerApiLoad());
+            gapi.load('client', initializeGapiClient);
         }
-      }
 
-      /**
-       *  Sign in the user upon button click.
-       */
-      function handleAuthClick() {
-        tokenClient.callback = async (resp) => {
-          if (resp.error !== undefined) {
-            throw (resp);
-          }
-          document.getElementById('signout_button').style.visibility = 'visible';
-          document.getElementById('authorize_button').innerText = 'Refresh';
-          //create("Test Spreadsheet", null)
-          try {
-            gapi.client.sheets.spreadsheets.values.get({
-              spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
-              range: 'A1:A2',
+        function onPickerApiLoad() {
+          pickerInited = true;
+        }
+
+        /**
+        * Callback after the API client is loaded. Loads the
+        * discovery doc to initialize the API.
+        */
+        async function initializeGapiClient() {
+            await gapi.client.init({
+              discoveryDocs: [DISCOVERY_DOC],
             });
-          } catch(err) {
-            const picker = new google.picker.PickerBuilder()
-              .setOAuthToken(gapi.client.getToken().access_token)
-              .setAppId('701363070682')
-              .addView(google.picker.ViewId.DOCS)
-              .setCallback((data) => {
-                console.log(data);
-              })
-              .build();
-
-            picker.setVisible(true);
-          }
-        };
-
-        if (gapi.client.getToken() === null) {
-          // Prompt the user to select a Google Account and ask for consent to share their data
-          // when establishing a new session.
-          tokenClient.requestAccessToken({prompt: 'consent'});
-        } else {
-          // Skip display of account chooser and consent dialog for an existing session.
-          tokenClient.requestAccessToken({prompt: ''});
         }
-      }
 
-      /**
-       *  Sign out the user upon button click.
-       */
-      function handleSignoutClick() {
-        const token = gapi.client.getToken();
-        if (token !== null) {
-          google.accounts.oauth2.revoke(token.access_token);
-          gapi.client.setToken('');
-          document.getElementById('content').innerText = '';
-          document.getElementById('authorize_button').innerText = 'Authorize';
-          document.getElementById('signout_button').style.visibility = 'hidden';
+        /**
+        * Callback after Google Identity Services are loaded.
+        */
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+              client_id: CLIENT_ID,
+              scope: SCOPES,
+              callback: '', // defined later
+            });
         }
-      }
 
-      function create(title, callback) {
-        try {
-          gapi.client.sheets.spreadsheets.create({
-            properties: {
-              title: title,
-            },
-          }).then((response) => {
-            if (callback) callback(response);
-            console.log('Spreadsheet ID: ' + response.result.spreadsheetId);
-          });
-        } catch (err) {
-          document.getElementById('content').innerText = err.message;
-          return;
+        function updateValues(spreadsheetId, range, values, valueInputOption='USER_ENTERED') {
+            if (gapi.client.getToken() === null) {
+              // Prompt the user to select a Google Account and ask for consent to share their data
+              // when establishing a new session.
+              tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+              // Skip display of account chooser and consent dialog for an existing session.
+              tokenClient.requestAccessToken({prompt: ''});
+            }
+            const body = {
+              values: values,
+            };
+            try {
+              gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: spreadsheetId,
+                range: range,
+                valueInputOption: valueInputOption,
+                resource: body,
+              }).then((response) => {
+                const result = response.result;
+                console.log(`${result.updatedCells} cells updated.`);
+              });
+            } catch (err) {
+              alert(err.message);
+              return;
+            }
         }
-      }
 
-      function updateValues(spreadsheetId, range, valueInputOption) {
-        let values = [
-          [
-            "Hand","James", "Amy", "Steve", "Elizabeth", "Bill"
-          ],
-          [
-            "Two Lays", "0", "5","55","100","130"
-          ],
-          [
-            "Two Runs", "0", "55","5","110","65"
-          ],
-          [
-            "One Lay, One Run", "20", "50","5","0","150"
-          ]
-        ];
-        const body = {
-          values: values,
-        };
-        try {
-          gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: spreadsheetId,
-            range: range,
-            valueInputOption: valueInputOption,
-            resource: body,
-          }).then((response) => {
-            const result = response.result;
-            console.log(`${result.updatedCells} cells updated.`);
-          });
-        } catch (err) {
-          document.getElementById('content').innerText = err.message;
-          return;
+        async function checkURL(){
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has("game_id")){
+                host_id = urlParams.get("game_id");
+                console.log(host_id);
+                while(main_content.firstChild){
+                    main_content.removeChild(main_content.firstChild);
+                }
+                main_content.insertAdjacentHTML('beforeend', playerNameForm);
+            }    
         }
-      }
-      
+
+        function createNewGame(){
+            tokenClient.callback = async (resp) => {
+              if (resp.error !== undefined) {
+                throw (resp);
+              }
+              //create("Test Spreadsheet", null)
+              try {
+                gapi.client.sheets.spreadsheets.values.get({
+                  spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
+                  range: 'A1:A2',
+                });
+              } catch(err) {
+                const picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.client.getToken().access_token)
+                  .setAppId('701363070682')
+                  .addView(google.picker.ViewId.DOCS)
+                  .setCallback((data) => {
+                    console.log(data);
+                  })
+                  .build();
+
+                picker.setVisible(true);
+              }
+            };
+            var peer = new Peer();
+            peer.on('open', function(id) {
+                console.log('My peer ID is: ' + id);
+                var url = "https://nextyeardc.com/MayI?game_id="+peer.id;
+                host_id = peer.id;
+                navigator.clipboard.writeText(url);
+                alert("New game url added to clipboard, please share with all players.\n" + url);
+                const now = new Date();
+                const startTime = now.toLocaleString();
+                gapi.client.sheets.spreadsheets.batchUpdate({
+                  spreadsheetId: '1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE',
+                  resource: {addSheetRequest: {
+                                properties: {
+                                    title: peer.id,
+                                },
+                  }},
+                });
+                updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', peer.id+'!A1:A2',[startTime])
+                updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', peer.id+'!B1:H1',['Two Lays','One Lay, One Run','Two Runs', 'Two Lays, One Run', 'Two Runs, One Lay', 'Three Lays', 'Three Runs']);
+            });
+            is_host = true;
+            let everyonesIn = document.createElement("button");
+            everyonesIn.class = "w3-button";
+            everyonesIn.id = "everyonesIn";
+            everyonesIn.innerHTML = "Everyone's In";
+            let playersbeingadded = `<ul class="w3-ul w3-card-4 w3-margin" id="players_in"></ul>`
+            main_content.removeChild(document.getElementById('newgame'));
+            main_content.insertAdjacentHTML('beforeend',playerNameForm);
+            main_content.insertAdjacentHTML('beforeend',playersbeingadded);
+            main_content.appendChild(everyonesIn);
+            peer.on('connection', function(conn) {
+                playerconnections.push(conn);
+                conn.on('data', function(data) {
+                    if (playerdata.has(data.playerName)){
+                        playerdata.get(data.playerName)[data.round] = data.score;
+                        updateGame();
+                    } else {
+                        playerdata.set(data.playerName, [0,0,0,0,0,0,0]);
+                        players_in = document.getElementById('players_in');
+                        let newplayername = document.createElement("li");
+                        newplayername.innerHTML = data.playerName;
+                        players_in.appendChild(newplayername);
+                    }
+                });
+            });
+        }
+
+        function updateGame(){
+            playerconnections.forEach(conn => {
+                conn.send({'playerdata': Object.fromEntries(playerdata)})
+            });
+            buildGameUI();
+            let idx = 2;
+            for (const [playername, scores] of playerdata) {
+                let row = [playername].concat(scores);
+                updateValues('1Iq8GUcCdmubSIWRHjXnFkThXxKKPqWeopNxQoiD_8dE', peer.id+'!A' + idx + ':H' + idx, row);
+                idx++;
+            }
+        }
+
+        function connectToGame(){
+            if(!is_host){
+                var peer = new Peer();
+                peer.on('open', function(id) {
+                    console.log('My peer ID is: ' + id);
+                    connectionToHost = peer.connect(host_id);
+                    connectionToHost.on('open', function() {
+                        my_name = document.getElementById("name").value;
+                        connectionToHost.send({'playerName':my_name})
+                        main_content.removeChild(document.getElementById('newplayer'));
+                        main_content.innerText = "Please wait for game to begin...";
+                        connectionToHost.on('data', function(data) {
+                            playerdata = new Map(Object.entries(data.playerdata));
+                            buildGameUI();
+                        });
+                    });
+                });
+            } else {
+                my_name = document.getElementById("name").value;
+                playerdata.set(my_name, [0,0,0,0,0,0,0]);
+                let newplayername = document.createElement("li");
+                newplayername.innerHTML = my_name;
+                players_in.appendChild(newplayername);
+            }
+            
+        }
+
+        function buildGameUI(){
+            while(main_content.firstChild){
+                main_content.removeChild(main_content.firstChild);
+            }
+            let scoreboard = `<table class="w3-table-all" id="scoreboard">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Two Lays</th>
+                                    <th>One Lay, One Run</th>
+                                    <th>Two Runs</th>
+                                    <th>Two Lays, One Run</th>
+                                    <th>Two Runs, One Lay</th>
+                                    <th>Three Lays</th>
+                                    <th>Three Runs</th>
+                                    <th>Total Score</th>
+                                </tr>`
+            for (const [playername, playerscore] of playerdata){
+                let totalscore = playerscore[0] + playerscore[1] + playerscore[2] + playerscore[3] + playerscore[4] + playerscore[5] + playerscore[6]
+                let scoreboard_row = `<tr>
+                                    <td>${playername}</td>
+                                    <td>${playerscore[0]}</td>
+                                    <td>${playerscore[1]}</td>
+                                    <td>${playerscore[2]}</td>
+                                    <td>${playerscore[3]}</td>
+                                    <td>${playerscore[4]}</td>
+                                    <td>${playerscore[5]}</td>
+                                    <td>${playerscore[6]}</td>
+                                    <td>${totalscore}</td>
+                                  </tr>`
+                scoreboard += scoreboard_row
+            }    
+            scoreboard += `</table>`
+            let newscorebug = `<div class="w3-container w3-card-4 w3-margin" id="newscore"> 
+                                    <h3>Enter Score</h3>
+                                    <select class="w3-select w3-margin-bottom" name="option" id="round">
+                                        <option value="null" disabled selected>Choose Hand</option>
+                                        <option value="0">Two Lays</option>
+                                        <option value="1">One Lay, One Run</option>
+                                        <option value="2">Two Runs</option>
+                                        <option value="3">Two Lays, One Run</option>
+                                        <option value="4">Two Runs, One Lay</option>
+                                        <option value="5">Three Lays</option>
+                                        <option value="6">Three Runs</option>
+                                    </select> 
+                                    <input class="w3-input w3-margin-bottom" type="text" placeholder="Score" id="score">
+                                    <button class="w3-button w3-block w3-blue w3-margin-bottom" id="send_score">Send</button>
+                                  </div>`
+            scoreboard += newscorebug;
+            main_content.insertAdjacentHTML('beforeend', scoreboard);
+        }
+
+        function sendScore(){
+            if (document.getElementById("round").value != "null"){
+                let gameround = Number(document.getElementById("round").value);
+                let playerscore = Number(document.getElementById("score").value);
+                if (playerscore % 5 == 0){
+                    if(!is_host){
+                        connectionToHost.send({'playerName':my_name,'round':gameround,'score':playerscore})
+                    } else {
+                        playerdata.get(my_name)[gameround] = playerscore;
+                        updateGame();
+                    }
+                } else {
+                    alert("Invalid score added, must be divisible by 5.");
+                }
+            } else {
+                alert("Cannot send score until hand is selected.");
+            }
+        }
+
+        main_content.addEventListener('click', function(event) {
+                console.log('Caught by event listener')
+                if (event.target && event.target.tagName.toLowerCase() === 'button') {
+                    if(event.target.id === 'newgame'){
+                        createNewGame();
+                    } else if (event.target.id === 'everyonesIn'){
+                        updateGame();
+                    } else if (event.target.id === 'send_score'){
+                        sendScore();
+                    } else if (event.target.id === 'joingame'){
+                        connectToGame();
+                    }
+                }
+            });
+
+        window.addEventListener('load', checkURL);
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-  </body>
-</html>
+</body>
